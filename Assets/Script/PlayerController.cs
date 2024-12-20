@@ -41,8 +41,9 @@ public class PlayerController : MonoBehaviour
         moveDir.z = 0f;
 
         transform.position += moveDir * moveSpeed * Time.deltaTime;
+        
 
-        if(Input.GetKeyDown(KeyCode.Space) && jumpCount<2)
+        if (Input.GetKeyDown(KeyCode.Space) && jumpCount<2)
         {
             rb.AddForce(new Vector3(0f, jump, 0f), ForceMode2D.Impulse);
             jumpCount++;
@@ -80,6 +81,11 @@ public class PlayerController : MonoBehaviour
         {
             jumpCount = 0;
             Debug.Log("Ground Ãæµ¹");
+        }
+
+        if (collision.gameObject.CompareTag("Collision"))
+        {
+            rb.AddForce(new Vector3(0f, jump, 0f), ForceMode2D.Impulse);
         }
     }
 }

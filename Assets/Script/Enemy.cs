@@ -5,27 +5,34 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    BoxCollider2D col;
+    [SerializeField]
+    GameObject obj;
+    bool OnTrigger;
     
 
 
     private void Awake()
     {
-        col = GetComponentInParent<BoxCollider2D>();
+        OnTrigger = false;
+        obj = GameObject.Find("Enemy");
+        Debug.Log(OnTrigger);
     }
 
     private void Update()
     {
-        
+        transform.position = obj.transform.position;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.gameObject.CompareTag("Player"))
         {
+            BoxCollider2D col = obj.GetComponent<BoxCollider2D>();
             col.isTrigger = true;
-            BoxCollider2D enemyCol = GetComponent<BoxCollider2D>();
-            enemyCol.isTrigger = true;
+            col = GetComponent<BoxCollider2D>();
+            col.isTrigger = true;
+            OnTrigger = true;
+            Debug.Log(OnTrigger);
         }
     }
 }

@@ -40,6 +40,7 @@ public class Camera : MonoBehaviour
             {
                 camPos.x = playerPos.x + offset;
             }
+            camPos.y = playerController.transform.position.y;
             transform.position = camPos;
         }
         else
@@ -49,6 +50,7 @@ public class Camera : MonoBehaviour
             {
                 camPos.x = playerPos.x - offset;
             }
+            camPos.y = playerController.transform.position.y;
             transform.position = camPos;
         }
 

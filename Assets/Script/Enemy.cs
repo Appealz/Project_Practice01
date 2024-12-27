@@ -12,7 +12,8 @@ public class Enemy : MonoBehaviour
 
     [SerializeField]
     int moveSpeed;
-    
+
+    public GameObject itemPrefabs;
 
 
     private void Awake()
@@ -31,16 +32,6 @@ public class Enemy : MonoBehaviour
     // 트리거 처리(겹쳐짐)
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //if(collision.gameObject.CompareTag("Player"))
-        //{
-        //    BoxCollider2D col = obj.GetComponent<BoxCollider2D>();
-        //    col.isTrigger = true;
-        //    col = GetComponent<BoxCollider2D>();
-        //    col.isTrigger = true;
-        //    OnTrigger = true;
-        //    Debug.Log(OnTrigger);
-        //}
-
         // 트리거된 오브젝트의 태그가 Right라면
         if (collision.gameObject.CompareTag("Right"))
         {
@@ -57,5 +48,23 @@ public class Enemy : MonoBehaviour
             // 캐릭터의 방향 원상태로
             sr.flipX = false;
         }
+
+        if (collision.gameObject.CompareTag("UnderGround"))
+        {
+            Destroy(gameObject);
+        }
     }
+
+    public void Die() // enemy 죽을때
+    {
+        StartCoroutine(dropCoin());
+    }
+
+    IEnumerator dropCoin()
+    {
+        Instantiate(itemPrefabs, transform.position, Quaternion.identity);
+
+        yield return new WaitForSeconds(1.5f);
+    }
+    
 }

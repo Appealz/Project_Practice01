@@ -27,17 +27,18 @@ public class PlayerController : MonoBehaviour
     float jumpRay;
 
     Animator animator;
-
     Rigidbody2D rb;
-
     GameObject obj;
+    GameDataManager gameDataManager;
+    
 
     private void Awake()
     {        
         TryGetComponent<Animator>(out animator);
         TryGetComponent<Rigidbody2D>(out rb);
-        obj = GameObject.Find("Enemy");
+        obj = GameObject.FindGameObjectWithTag("Enemy");
         isMove = true;
+        gameDataManager = FindAnyObjectByType<GameDataManager>();    
     }
 
     // Update is called once per frame
@@ -118,24 +119,65 @@ public class PlayerController : MonoBehaviour
     }
 
     // 적과 충돌
+    //private void EnemyCol()
+    //{
+    //    RaycastHit2D ray = Physics2D.Raycast(transform.position, Vector2.down, 1f, LayerMask.GetMask("Enemy"));
+    //    obj.TryGetComponent<BoxCollider2D>(out BoxCollider2D col);
+    //    Rigidbody2D enemyRb = obj.GetComponent<Rigidbody2D>();
+        
+    //    // ray가 있다면
+    //    if (ray)
+    //    {            
+    //        // col(Enemy의 BoxCollider2D 컴포넌트)의 istrigger를 true로
+    //        col.isTrigger = true;
+    //        obj.TryGetComponent<Enemy>(out Enemy enemy);
+            
+    //        // 1.1f 만큼 y축으로 impulse            
+    //        if (rb.velocity.y < 0f)
+    //        {                
+    //            rb.AddForce(new Vector3(0f, jump, 0f), ForceMode2D.Impulse);
+    //            enemyRb.AddForce(new Vector3(0f, 1.1f, 0f), ForceMode2D.Impulse);
+    //            enemy.Die(); // enemy 처리 메소드 
+    //            Debug.Log("Enemy 충돌");
+    //        }
+    //    }
+    //}
     private void EnemyCol()
     {
+        // Perform Raycast
         RaycastHit2D ray = Physics2D.Raycast(transform.position, Vector2.down, 1f, LayerMask.GetMask("Enemy"));
-        obj.TryGetComponent<BoxCollider2D>(out BoxCollider2D col);
-        Rigidbody2D enemyRb = obj.GetComponent<Rigidbody2D>();
-        
-        // ray가 있다면
-        if (ray)
-        {            
-            // col(Enemy의 BoxCollider2D 컴포넌트)의 istrigger를 true로
-            col.isTrigger = true;            
-            // 1.1f 만큼 y축으로 impulse            
-            if (rb.velocity.y < 0f)
-            {                
-                rb.AddForce(new Vector3(0f, jump, 0f), ForceMode2D.Impulse);
-                enemyRb.AddForce(new Vector3(0f, 1.1f, 0f), ForceMode2D.Impulse);
-                Debug.Log("Enemy 충돌");
-            }            
+
+        // Check if the ray hit an object
+        if (ray.collider != null)
+        {
+            GameObject obj = ray.collider.gameObject;
+
+            // Try to get necessary components
+            if (obj.TryGetComponent<BoxCollider2D>(out BoxCollider2D col) &&
+                obj.TryGetComponent<Rigidbody2D>(out Rigidbody2D enemyRb) &&
+                obj.TryGetComponent<Enemy>(out Enemy enemy))
+            {
+                // Make the enemy collider a trigger
+                col.isTrigger = true;
+
+                // Only apply force if the player is falling
+                if (rb.velocity.y < 0f)
+                {
+                    // Player jumps
+                    rb.AddForce(new Vector3(0f, jump, 0f), ForceMode2D.Impulse);
+
+                    // Apply impulse to the enemy
+                    if (enemyRb != null)
+                    {
+                        enemyRb.AddForce(new Vector3(0f, 2f, 0f), ForceMode2D.Impulse);
+                    }
+                    // Kill the enemy
+                    enemy.Die();
+
+                    // Debug log
+                    Debug.Log("Enemy 충돌");
+                }
+            }
         }
     }
 
@@ -160,7 +202,8 @@ public class PlayerController : MonoBehaviour
             {
                 // 왼쪽으로 2만큼(-2) 위로 5만큼 impulse
                 rb.AddForce(new Vector3(-2f, 5f, 0f), ForceMode2D.Impulse);
-            }            
+            }
+            gameDataManager.lifeCount--;
         }
 
         // 충돌 오브젝트의 태그가 Ground라면
@@ -168,8 +211,16 @@ public class PlayerController : MonoBehaviour
         {
             // 이동 가능하도록 isMove를 true
             isMove = true;
-        }        
+        }
     }
 
-    
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Coin"))
+        {
+            Destroy(collision.gameObject);
+            gameDataManager.coinCount++;
+        }
+    }
+
 }

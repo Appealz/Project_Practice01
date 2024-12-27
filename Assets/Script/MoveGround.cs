@@ -11,6 +11,9 @@ public class MoveGround : MonoBehaviour
     int moveDirY;
     [SerializeField]
     float moveSpeed;
+
+    [SerializeField]
+    float moveLength;
     Vector3 startPos;
 
     private void Awake()
@@ -48,7 +51,7 @@ public class MoveGround : MonoBehaviour
     void moveY()
     {
         transform.position += new Vector3(0f, Time.deltaTime * moveSpeed  * moveDirY, 0f);
-        if (Vector3.Distance(startPos, transform.position) > 4f)
+        if (Vector3.Distance(startPos, transform.position) > moveLength)
         {
             moveDirY = -1;
         }
